@@ -1,4 +1,5 @@
 (ns garlic-storm.hashing
+  (:require [clojure.string :as string])
   (:import (java.security MessageDigest)))
 
 ;;; Taken mostly from
@@ -19,8 +20,17 @@
 
 (def md5-hash (memoize md5-hash))
 
-(defn- hash-node [node replicas]
-  (map #(sorted-map (md5-hash (str node ":" %)) node) (range replicas)))
+(defn pythonise [node]
+  (-> (str node)
+      (string/replace "\"" "'")
+      (string/replace "]" ")")
+      (string/replace "[" "(")
+      (string/replace " " ", ")))
+
+(defn hash-node [node replicas]
+  (let [str-node (pythonise node)]
+    (println str-node)
+    (map #(sorted-map (md5-hash (str str-node ":" %)) node) (range replicas))))
 
 (defn add-node [ring node replicas]
   (apply merge ring (hash-node node replicas)))

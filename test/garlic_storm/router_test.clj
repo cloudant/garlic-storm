@@ -17,7 +17,11 @@
 
   (testing "Getting route for metric matches the returns value from graphite's implementation"
     (let [routes (routes [["service" 1 12345] ["another" 1 9999]] 5)]
-      (is (= ["another" 9999] (get-route routes "metric"))))))
+      (is (= ["another" 9999] (get-route routes "metric"))))
+
+    (let [routes (routes [["192.168.0.18" 1 24001] ["192.168.0.18" 2 24002]] 1)]
+      (is (= ["192.168.0.18" 24001] (get-route routes "load.shortterm")))
+      (is (= ["192.168.0.18" 24002] (get-route routes "df.root.df_complex.free"))))))
 
 (deftest on-adding-routes
   (testing "Adding a route with a nil port throws"

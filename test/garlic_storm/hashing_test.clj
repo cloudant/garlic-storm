@@ -2,6 +2,14 @@
   (:require [clojure.test :refer :all]
             [garlic-storm.hashing :refer :all]))
 
+(deftest on-the-hash-function
+  (testing "It behaves just like graphites"
+    (is (= (md5-hash "('192.168.0.18', 2):1") 55736))))
+
+(deftest on-hashing-nodes
+  (testing "It behaves just like graphites"
+    (is (= (first (hash-node ["192.168.0.18" 2] 1)) {23870 ["192.168.0.18" 2]}))))
+
 (deftest creating-rings
   (testing "Creating a ring with replicas <= 0 results in empty ring"
     (is (= {} (make-ring ["node1" "node2"] 0)))
