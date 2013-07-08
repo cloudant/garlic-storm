@@ -1,7 +1,8 @@
-(defproject garlic-storm "0.0.1-SNAPSHOT"
+(defproject garlic-storm "0.1.0-SNAPSHOT"
   :description "An implementation of graphite relays"
 
   :url "http://github.com/ulises/garlic-storm"
+
   :license {:name "Apache License Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.txt"
             :distribution :repo}
