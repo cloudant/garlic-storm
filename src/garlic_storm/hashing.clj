@@ -17,6 +17,8 @@
         hexdigest (.toString (BigInteger. 1 digest) 16)]
     (Integer/parseInt (reduce str (take 4 hexdigest)) 16)))
 
+(def md5-hash (memoize md5-hash))
+
 (defn- hash-node [node replicas]
   (map #(sorted-map (md5-hash (str node ":" %)) node) (range replicas)))
 
