@@ -4,11 +4,16 @@
 
 (deftest on-the-hash-function
   (testing "It behaves just like graphites"
-    (is (= (md5-hash "('192.168.0.18', 2):1") 55736))))
+    (is (= (md5-hash "('192.168.0.18', 2):1") 55736))
+    (is (= (md5-hash "memory.active") 13347))
+    (is (= (md5-hash "memory.free") 23055))))
 
 (deftest on-hashing-nodes
   (testing "It behaves just like graphites"
-    (is (= (first (hash-node ["192.168.0.18" 2] 1)) {23870 ["192.168.0.18" 2]}))))
+    (let [node1 ["127.0.0.1" 1]
+          node2 ["127.0.0.1" 2]]
+      (is (= (first (hash-node node1 1)) {847 node1}))
+      (is (= (first (hash-node node2 1)) {34743 node2})))))
 
 (deftest creating-rings
   (testing "Creating a ring with replicas <= 0 results in empty ring"
@@ -41,9 +46,11 @@
 
 (deftest just-like-graphites-hashing
   (testing "Should return the same node as graphite's hashing"
-    (let [ring (make-ring ["foo" "bar"] 5)]
-      (is (= "bar" (node-for ring "hi")))
-      (is (= "foo" (node-for ring "some.service.com")))))
+    (let [node1 ["127.0.0.1" 1]
+          node2 ["127.0.0.1" 2]
+          ring (make-ring [node1 node2] 100)]
+      (is (= node1 (node-for ring "memory.interactive")))
+      (is (= node2 (node-for ring "memory.free")))))
 
   (testing "Should be able to hash [service-name instance]"
     (let [ring (make-ring [["service" 1] ["another-service" 1]] 5)]

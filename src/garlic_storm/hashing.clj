@@ -8,6 +8,9 @@
 ;;; used in
 ;;; https://github.com/graphite-project/carbon/blob/master/lib/carbon/hashing.py#L16
 
+(defn- zero-pad [digest]
+  (string/join (reverse (into (repeat (- 32 (count digest)) "0") digest))))
+
 (defn- md5-hash
   "Calculate hash for the given object. This implementation follows closely
    that of graphite's compute_ring_position() in hashing.py"
@@ -16,7 +19,7 @@
         digest (.digest (MessageDigest/getInstance "MD5")
                         (.getBytes o))
         hexdigest (.toString (BigInteger. 1 digest) 16)]
-    (Integer/parseInt (reduce str (take 4 hexdigest)) 16)))
+    (Integer/parseInt (subs (zero-pad hexdigest) 0 4) 16)))
 
 (def md5-hash (memoize md5-hash))
 
@@ -29,7 +32,6 @@
 
 (defn hash-node [node replicas]
   (let [str-node (pythonise node)]
-    (println str-node)
     (map #(sorted-map (md5-hash (str str-node ":" %)) node) (range replicas))))
 
 (defn add-node [ring node replicas]
