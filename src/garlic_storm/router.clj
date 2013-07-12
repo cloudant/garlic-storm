@@ -18,5 +18,5 @@
   (reduce (fn [acc [service instance port]] (add-route acc {:service service
                                                            :instance instance
                                                            :port port}))
-          {:replicas replicas}
+          {:replicas replicas :ring (sorted-map)}
           services))

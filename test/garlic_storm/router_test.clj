@@ -12,16 +12,36 @@
 
 (deftest on-getting-routes
   (testing "Getting route for metric returns a [service port] pair"
-    (let [routes (routes [["service" 1 12345]] 5)]
+    (let [routes (routes [["service" "1" 12345]] 5)]
       (is (= ["service" 12345] (get-route routes "metric")))))
 
   (testing "Getting route for metric matches the returns value from graphite's implementation"
-    (let [routes (routes [["service" 1 12345] ["another" 1 9999]] 5)]
-      (is (= ["another" 9999] (get-route routes "metric"))))
+    (let [node1 ["192.168.0.18" "1" 24001]
+          node2 ["192.168.0.18" "2" 24002]
+          router (routes [node1 node2] 100)]
 
-    (let [routes (routes [["192.168.0.18" 1 24001] ["192.168.0.18" 2 24002]] 1)]
-      (is (= ["192.168.0.18" 24001] (get-route routes "load.shortterm")))
-      (is (= ["192.168.0.18" 24002] (get-route routes "df.root.df_complex.free"))))))
+      ;;; node1 assertions
+      (is (= ["192.168.0.18" 24001] (get-route router "carbon.relays.graphite-1.cpuUsage")))
+
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.load.midterm")))
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.load.shortterm")))
+
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.memory.free")))
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.memory.inactive")))
+
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.df.root.df_complex.reserved")))
+      (is (= ["192.168.0.18" 24001] (get-route router "net.macbook.ulises.df.root.df_complex.free")))
+
+      ;;; node2 assertions
+      (is (= ["192.168.0.18" 24002] (get-route router "carbon.relays.graphite-1.memUsage")))
+
+      (is (= ["192.168.0.18" 24002] (get-route router "net.macbook.ulises.load.longterm")))
+
+      (is (= ["192.168.0.18" 24002] (get-route router "net.macbook.ulises.df.root.df_complex.used")))
+      (is (= ["192.168.0.18" 24002] (get-route router "net.macbook.ulises.load.longterm")))
+
+      (is (= ["192.168.0.18" 24002] (get-route router "net.macbook.ulises.memory.active")))
+      (is (= ["192.168.0.18" 24002] (get-route router "net.macbook.ulises.memory.wired"))))))
 
 (deftest on-adding-routes
   (testing "Adding a route with a nil port throws"
@@ -36,4 +56,10 @@
   (testing "Adding a route to an invalid routes-map throws"
     (let [s {:service "s" :instance 1 :port 9999}]
       (is (thrown? AssertionError (add-route {} s)))
-      (is (thrown? AssertionError (add-route nil s))))))
+      (is (thrown? AssertionError (add-route nil s)))))
+
+  (testing "Re-adding the same route is a noop"
+    (let [service {:service "s" :port 9999 :instance "1"}
+          route (add-route {:replicas 1 :ring (sorted-map) :ports {}}
+                           service)]
+      (is (= route (add-route route service))))))
