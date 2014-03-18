@@ -11,7 +11,7 @@
 (defn- zero-pad [digest]
   (string/join (reverse (into (repeat (- 32 (count digest)) "0") digest))))
 
-(defn- md5-hash
+(defn md5-hash
   "Calculate hash for the given object. This implementation follows closely
    that of graphite's compute_ring_position() in hashing.py"
   [o]
@@ -20,8 +20,6 @@
                         (.getBytes o))
         hexdigest (.toString (BigInteger. 1 digest) 16)]
     (Integer/parseInt (subs (zero-pad hexdigest) 0 4) 16)))
-
-(def md5-hash (memoize md5-hash))
 
 (defn pythonise [node]
   (-> (str node)
