@@ -8,8 +8,6 @@
     (if-let [server-instance (node-for ring metric)]
       [(first server-instance) (get ports server-instance)])))
 
-(def get-route (memoize get-route))
-
 (defn add-route [{:keys [ring ports replicas] :as routes} {:keys [service instance port]}]
   {:pre [service instance port replicas]}
   (if (contains? ports [service instance]) routes
