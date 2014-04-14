@@ -1,6 +1,5 @@
 (ns garlic-storm.router
-  (:require [garlic-storm.hashing :refer [make-ring add-node remove-node
-                                          node-for]]))
+  (:require [garlic-storm.hashing :refer [make-ring add-node node-for]]))
 
 (defn get-route [{:keys [ring ports replicas] :as routes} metric]
   {:pre [replicas]}

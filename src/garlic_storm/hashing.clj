@@ -30,23 +30,20 @@
 
 (defn hash-node [node replicas]
   (let [str-node (pythonise node)]
-    (map #(sorted-map (md5-hash (str str-node ":" %)) node) (range replicas))))
+    (map #(sorted-map (md5-hash (str str-node ":" %)) [node]) (range replicas))))
 
 (defn add-node [ring node replicas]
-  (apply merge ring (hash-node node replicas)))
-
-(defn remove-node [ring node replicas]
-  (apply dissoc ring (map first (map keys (hash-node node replicas)))))
+  (apply merge-with concat ring (hash-node node replicas)))
 
 (defn make-ring [nodes replicas]
   (reduce (fn [ring node] (add-node ring node replicas)) (sorted-map) nodes))
 
 (defn- tail-map [ring hash]
-  (filter #(< 0 (compare (key %) hash)) ring))
+  (filter #(<= 0 (compare (key %) hash)) ring))
 
 (defn node-for [ring o]
   (let [hash (md5-hash o)
         tmap (tail-map ring hash)]
     (if (empty? tmap)
-      (val (first ring))
-      (val (first tmap)))))
+      (first (val (first ring)))
+      (first (val (first tmap))))))

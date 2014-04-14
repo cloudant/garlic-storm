@@ -12,8 +12,8 @@
   (testing "It behaves just like graphites"
     (let [node1 ["192.168.0.18" 1]
           node2 ["192.168.0.18" 2]]
-      (is (= (first (hash-node node1 1)) {36935 node1}))
-      (is (= (first (hash-node node2 1)) {23870 node2})))))
+      (is (= (first (hash-node node1 1)) {36935 [node1]}))
+      (is (= (first (hash-node node2 1)) {23870 [node2]})))))
 
 (deftest creating-rings
   (testing "Creating a ring with replicas <= 0 results in empty ring"
@@ -33,12 +33,7 @@
           (is (< (first entry1) (first entry2)))
           (recur (first ring) (second ring) (drop 2 ring)))))))
 
-(deftest adding-removing-nodes
-  (testing "Removing a node returns a ring with no entries for it"
-    (let [replicas 3
-          ring (make-ring ["foo"] replicas)
-          ring-with-bar (add-node ring "bar" replicas)]
-      (is (= ring (remove-node ring-with-bar "bar" replicas)))))
+(deftest adding-nodes
 
   (testing "Adding a node returns a ring with entries for it"
     (let [replicas 3
