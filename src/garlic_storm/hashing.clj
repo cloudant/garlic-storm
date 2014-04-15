@@ -34,7 +34,7 @@
                           (range replicas)))))
 
 (defn add-node [ring node replicas]
-  (merge-with (comp reverse concat) ring (hash-node node replicas)))
+  (merge-with (comp sort into) ring (hash-node node replicas)))
 
 (defn make-ring [nodes replicas]
   (reduce (fn [ring node] (add-node ring node replicas)) (sorted-map) nodes))
