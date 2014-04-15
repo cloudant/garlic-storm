@@ -30,10 +30,11 @@
 
 (defn hash-node [node replicas]
   (let [str-node (pythonise node)]
-    (map #(sorted-map (md5-hash (str str-node ":" %)) [node]) (range replicas))))
+    (reduce merge {} (map #(sorted-map (md5-hash (str str-node ":" %)) [node])
+                          (range replicas)))))
 
 (defn add-node [ring node replicas]
-  (apply merge-with concat ring (hash-node node replicas)))
+  (merge-with (comp reverse concat) ring (hash-node node replicas)))
 
 (defn make-ring [nodes replicas]
   (reduce (fn [ring node] (add-node ring node replicas)) (sorted-map) nodes))

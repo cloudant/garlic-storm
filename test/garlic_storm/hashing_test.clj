@@ -12,8 +12,8 @@
   (testing "It behaves just like graphites"
     (let [node1 ["192.168.0.18" 1]
           node2 ["192.168.0.18" 2]]
-      (is (= (first (hash-node node1 1)) {36935 [node1]}))
-      (is (= (first (hash-node node2 1)) {23870 [node2]})))))
+      (is (= (first (hash-node node1 1)) [36935 [node1]]))
+      (is (= (first (hash-node node2 1)) [23870 [node2]])))))
 
 (deftest creating-rings
   (testing "Creating a ring with replicas <= 0 results in empty ring"

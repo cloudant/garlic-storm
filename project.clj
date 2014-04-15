@@ -1,4 +1,4 @@
-(defproject garlic-storm "0.1.3-SNAPSHOT"
+(defproject garlic-storm "0.1.4-SNAPSHOT"
   :description "An implementation of graphite relays"
 
   :url "http://github.com/ulises/garlic-storm"
